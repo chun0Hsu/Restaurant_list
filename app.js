@@ -22,6 +22,7 @@ app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }))
 
 db.on("error", () => {
   console.log("mongodb error.");
@@ -45,6 +46,18 @@ app.get("/restaurants/:id", (req, res) => {
     .then((item) => res.render("show", { item }))
     .catch((err) => console.log(err));
 });
+
+app.get('/new', (req, res) => {
+  res.render('new')
+})
+
+app.post('/restaurants', (req, res) => {
+  const addItem = req.body
+  
+  RestaurantList.create(addItem)
+    .then(() => res.redirect('/'))
+    .catch(err => console.log(err))
+})
 
 app.get("/search", (req, res) => {
   const queryItems = restaurantList.results.filter(
