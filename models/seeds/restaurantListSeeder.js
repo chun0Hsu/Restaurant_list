@@ -20,18 +20,7 @@ db.on("error", () => {
 db.once("open", () => {
   console.log("mongodb connected.");
   const restaurantList = restaurantJson.results;
-  for (let ele of restaurantList) {
-    RestaurantList.create({
-      name: ele.name,
-      name_en: ele.name_en,
-      category: ele.category,
-      image: ele.image,
-      location: ele.location,
-      phone: ele.phone,
-      google_map: ele.google_map,
-      rating: ele.rating,
-      description: ele.description,
-    });
-  }
-  console.log("done.");
+  RestaurantList.create(restaurantList)
+    .then(() => console.log("create seeder done."))
+    .catch(() => console.log("create seeder error."));
 });
