@@ -39,11 +39,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/restaurants/:id", (req, res) => {
-  const restaurant = restaurantList.results.find(
-    (item) => item.id.toString() === req.params.id
-  );
-
-  res.render("show", { item: restaurant });
+  const id = req.params.id;
+  const restaurant = RestaurantList.findById(id)
+    .lean()
+    .then((item) => res.render("show", { item }))
+    .catch((err) => console.log(err));
 });
 
 app.get("/search", (req, res) => {
