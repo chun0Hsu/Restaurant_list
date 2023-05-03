@@ -1,30 +1,60 @@
-const express = require('express')
-const app = express()
-const port = 3000
-const exphbs = require('express-handlebars')
-const restaurantList = require('./restaurant.json')
+const express = require("express");
+const app = express();
+const port = 3000;
+const exphbs = require("express-handlebars");
+const mongoose = require("mongoose");
+const RestaurantList = require("./models/restaurantList");
 
-app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
-app.set('view engine', 'handlebars')
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 
-app.use(express.static('public'))
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-app.get('/', (req, res) => {
-  res.render('index', { items: restaurantList.results })
-})
+const db = mongoose.connection;
 
-app.get('/restaurants/:id', (req, res) => {
-  const restaurant = restaurantList.results.find(item => item.id.toString() === req.params.id)
+// const restaurantList = require('./restaurant.json')
 
-  res.render('show', { item: restaurant })
-})
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
 
-app.get('/search', (req, res) => {
-  const queryItems = restaurantList.results.filter(item => req.query.keyword === item.name || req.query.keyword === item.category)
+app.use(express.static("public"));
 
-  res.render('index', { items: queryItems, keyword: req.query.keyword })
-})
+db.on("error", () => {
+  console.log("mongodb error.");
+});
+
+db.once("open", () => {
+  console.log("mongodb connected.");
+});
+
+app.get("/", (req, res) => {
+  RestaurantList.find()
+    .lean()
+    .then((items) => res.render("index", { items }))
+    .catch((err) => console.log(err));
+});
+
+app.get("/restaurants/:id", (req, res) => {
+  const restaurant = restaurantList.results.find(
+    (item) => item.id.toString() === req.params.id
+  );
+
+  res.render("show", { item: restaurant });
+});
+
+app.get("/search", (req, res) => {
+  const queryItems = restaurantList.results.filter(
+    (item) =>
+      req.query.keyword === item.name || req.query.keyword === item.category
+  );
+
+  res.render("index", { items: queryItems, keyword: req.query.keyword });
+});
 
 app.listen(port, () => {
-  console.log('running')
-})
+  console.log("running");
+});
