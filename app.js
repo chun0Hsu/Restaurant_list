@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 
 app.get("/restaurants/:id", (req, res) => {
   const id = req.params.id;
-  const restaurant = RestaurantList.findById(id)
+  RestaurantList.findById(id)
     .lean()
     .then((item) => res.render("show", { item }))
     .catch((err) => console.log(err));
