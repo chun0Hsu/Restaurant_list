@@ -3,6 +3,7 @@ const app = express();
 const port = 3000;
 const exphbs = require("express-handlebars");
 const mongoose = require("mongoose");
+const restaurantList = require("./models/restaurantList");
 const RestaurantList = require("./models/restaurantList");
 
 if (process.env.NODE_ENV !== "production") {
@@ -15,8 +16,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 });
 
 const db = mongoose.connection;
-
-// const restaurantList = require('./restaurant.json')
 
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
@@ -53,19 +52,44 @@ app.get('/new', (req, res) => {
 
 app.post('/restaurants', (req, res) => {
   const addItem = req.body
-  
+
   RestaurantList.create(addItem)
     .then(() => res.redirect('/'))
     .catch(err => console.log(err))
 })
 
-app.get("/search", (req, res) => {
-  const queryItems = restaurantList.results.filter(
-    (item) =>
-      req.query.keyword === item.name || req.query.keyword === item.category
-  );
+app.get('/restaurants/:id/edit', (req, res) => {
+  const id = req.params.id
 
-  res.render("index", { items: queryItems, keyword: req.query.keyword });
+  RestaurantList.findById(id)
+    .lean()
+    .then(item => res.render('edit', { item }))
+    .catch(err => console.log(err))
+})
+
+app.post('/restaurants/:id/edit', (req, res) => {
+  const id = req.params.id
+  const modifyItem = req.body
+
+  RestaurantList.findByIdAndUpdate(id, modifyItem)
+    .then(() => res.redirect(`/restaurants/${id}`))
+    .catch(err => console.log(err))
+})
+
+app.post('/restaurants/:id/delete', (req, res) => {
+  const id = req.params.id
+  RestaurantList.findById(id)
+    .then(item => item.deleteOne()) //mongoose@7.1.0 remove()棄用
+    .then(() => res.redirect('/'))
+    .catch(err => console.log(err))
+})
+
+app.get("/search", (req, res) => {
+  const keyword = req.query.keyword
+  RestaurantList.find({$or: [{name: keyword}, {category: keyword}]})
+    .lean()
+    .then(items => res.render('index', {items, keyword}))
+    .catch(err => console.log(err))
 });
 
 app.listen(port, () => {
