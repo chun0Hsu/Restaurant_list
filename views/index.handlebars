@@ -1,20 +1,28 @@
 <!-- search bar -->
 <div class="container search-bar">
-  <div class="search-bar-outer">
+  <div class="search-bar-outer d-flex justify-content-between">
     <div class="search-bar-inner">
       <form action="/search">
         <h4 class="mb-2">尋找餐廳：</h4>
         <div class="input-group">
-          <input type="text" name="keyword" class="form-control" placeholder="輸入餐廳、分類" aria-label="Restaurant Name..."
+          <input type="text" name="keyword" class="form-control" placeholder="輸入餐廳、類別" aria-label="Restaurant Name..."
             value="{{keyword}}" aria-describedby="search-button" />
           <div class="input-group-append">
             <button class="btn btn-major" type="submit" id="search-button"><i class="fas fa-search"></i></button>
           </div>
         </div>
       </form>
-      <div class="text-center mt-3">
-        <a class="btn btn-info" href="/restaurants/new">新增餐廳</a>
-      </div>
+    </div>
+    <div>
+      <form action="/">
+        <select class="form-select form-select-lg mb-3 mt-4" onchange="this.form.submit()" name="sortWay" id="sortWay">
+          <option value="" {{#if selectedObject.sort}}selected{{/if}} hidden>Sort</option>
+          <option value="asc" {{#if selectedObject.aToz}}selected{{/if}}>A -> Z</option>
+          <option value="desc" {{#if selectedObject.zToa}}selected{{/if}}>Z -> A</option>
+          <option value="category" {{#if selectedObject.category}}selected{{/if}}>類別</option>
+          <option value="location" {{#if selectedObject.location}}selected{{/if}}>地區</option>
+        </select>
+      </form>
     </div>
   </div>
 </div>
