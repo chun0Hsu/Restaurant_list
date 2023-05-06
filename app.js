@@ -2,8 +2,9 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const exphbs = require("express-handlebars");
-require('./config/mongoose')
+const methodOverride = require('method-override')
 
+require('./config/mongoose')
 const RestaurantList = require("./models/restaurantList");
 
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
@@ -11,7 +12,7 @@ app.set("view engine", "handlebars");
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }))
-
+app.use(methodOverride('_method'))
 
 
 app.get("/", (req, res) => {
@@ -21,6 +22,10 @@ app.get("/", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+app.get('/restaurants/new', (req, res) => {
+  res.render('new')
+})
+
 app.get("/restaurants/:id", (req, res) => {
   const id = req.params.id;
   RestaurantList.findById(id)
@@ -28,10 +33,6 @@ app.get("/restaurants/:id", (req, res) => {
     .then((item) => res.render("show", { item }))
     .catch((err) => console.log(err));
 });
-
-app.get('/new', (req, res) => {
-  res.render('new')
-})
 
 app.post('/restaurants', (req, res) => {
   const addItem = req.body
@@ -50,7 +51,7 @@ app.get('/restaurants/:id/edit', (req, res) => {
     .catch(err => console.log(err))
 })
 
-app.post('/restaurants/:id/edit', (req, res) => {
+app.put('/restaurants/:id', (req, res) => {
   const id = req.params.id
   const modifyItem = req.body
 
@@ -59,7 +60,7 @@ app.post('/restaurants/:id/edit', (req, res) => {
     .catch(err => console.log(err))
 })
 
-app.post('/restaurants/:id/delete', (req, res) => {
+app.delete('/restaurants/:id', (req, res) => {
   const id = req.params.id
   RestaurantList.findById(id)
     .then(item => item.deleteOne()) //mongoose@7.1.0 remove()棄用
@@ -69,9 +70,9 @@ app.post('/restaurants/:id/delete', (req, res) => {
 
 app.get("/search", (req, res) => {
   const keyword = req.query.keyword
-  RestaurantList.find({$or: [{name: keyword}, {category: keyword}]})
+  RestaurantList.find({ $or: [{ name: keyword }, { category: keyword }] })
     .lean()
-    .then(items => res.render('index', {items, keyword}))
+    .then(items => res.render('index', { items, keyword }))
     .catch(err => console.log(err))
 });
 

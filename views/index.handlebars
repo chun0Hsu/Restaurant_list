@@ -13,7 +13,7 @@
         </div>
       </form>
       <div class="text-center mt-3">
-        <a class="btn btn-info" href="/new">新增餐廳</a>
+        <a class="btn btn-info" href="/restaurants/new">新增餐廳</a>
       </div>
     </div>
   </div>
@@ -42,7 +42,7 @@
             <div class="text-end">
               <a class="btn btn-primary" href="/restaurants/{{this._id}}/edit">Edit</a>
               <a class="btn btn-primary" href="/restaurants/{{this._id}}">Detail</a>
-              <form action="/restaurants/{{this._id}}/delete" method="POST" style="display: inline;">
+              <form action="/restaurants/{{this._id}}?_method=DELETE" method="POST" style="display: inline;">
                 <button type="submit" class="btn btn-danger">
                   Delete
                 </button>
