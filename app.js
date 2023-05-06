@@ -2,20 +2,9 @@ const express = require("express");
 const app = express();
 const port = 3000;
 const exphbs = require("express-handlebars");
-const mongoose = require("mongoose");
-const restaurantList = require("./models/restaurantList");
+require('./config/mongoose')
+
 const RestaurantList = require("./models/restaurantList");
-
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
-
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
 
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
@@ -23,13 +12,7 @@ app.set("view engine", "handlebars");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }))
 
-db.on("error", () => {
-  console.log("mongodb error.");
-});
 
-db.once("open", () => {
-  console.log("mongodb connected.");
-});
 
 app.get("/", (req, res) => {
   RestaurantList.find()
